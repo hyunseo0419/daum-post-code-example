@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import DaumPostcode from "react-daum-postcode";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+  state = {
+    showPostcode: false,
+    address: ""
+  };
+
+  handleAddress = data => {
+    let fullAddress = data.address;
+    let extraAddress = "";
+
+    if (data.addressType === "R") {
+      if (data.bname !== "") {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== "") {
+        extraAddress +=
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+    }
+    this.setState({
+      address: fullAddress,
+      showPostcode: false
+    });
+    console.log(fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
+  };
+  render() {
+    return (
+      <>
+        <input
+          value={this.state.address}
+          onClick={() => {
+            this.setState({ showPostcode: true });
+          }}
+        ></input>
+        {this.state.showPostcode ? (
+          // if you want this component in modal , add here
+          <DaumPostcode
+            onComplete={this.handleAddress}
+            width={500}
+            height={300}
+            autoClose={true}
+          />
+        ) : null}
+      </>
+    );
+  }
 }
-
-export default App;
